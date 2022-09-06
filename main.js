@@ -1,4 +1,6 @@
 // Modules to control application life and create native browser window
+require('dotenv').config();
+
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const net = require('net');
@@ -9,12 +11,18 @@ const fs = require('fs');
 const client = new net.Socket()
 let mainWindow = null;
 
-client.connect(6667, 'irc.chat.twitch.tv', () => {
+client.connect(process.env.TWITCH_IRC_PORT, process.env.TWITCH_IRC_SERVER, () => {
   client.write("CAP REQ :twitch.tv/commands twitch.tv/tags\r\n");
-  client.write("PASS oauth:ohwqg1jiq7y60zstzrf773orf71p1s\r\n");
-  client.write("NICK EWolf34\r\n");
+  client.write(`PASS ${process.env.TWITCH_TOKEN}\r\n`);
+  client.write(`NICK ${process.env.TWITCH_LOGIN}\r\n`);
+  client.write("JOIN #ewolf34\r\n");
   client.write("JOIN #donchicko\r\n");
   client.write("JOIN #hellcat14\r\n");
+  client.write("JOIN #kuluk01\r\n");
+  client.write("JOIN #iateyourpie\r\n");
+  client.write("JOIN #themexicanrunner\r\n");
+  client.write("JOIN #s3sh\r\n");
+  client.write("JOIN #nuke73\r\n");
 
   // twitch.on('myEvent', (v) => {
   //   console.log(v);
@@ -26,13 +34,13 @@ function processMessage(message) {
   let re1 = /([\w-]+)\=([^;]*)/gim;
   let arr = [...message[0].matchAll(re1)];
   let msg = {
-    attributes: {},
+    attributes: {emotes: null},
     service: 'TWITCH',
     type: message[2],
     channel: message[3].substring(1),
     message: {
       raw: null,
-      treated: null,
+      display: null,
       reading: null,
     }
   };
@@ -43,10 +51,28 @@ function processMessage(message) {
     msg['attributes'][v[1]] = v[2].length ? v[2] : null;
   });
 
-  msg.name = msg['attributes']['display-name'];
+  msg.message.name = msg['attributes']['display-name'];
   msg.message.raw = message.join(' ').trim().substring(1);
-  msg.message.treated = message.join(' ').trim().substring(1);
+  msg.message.display = message.join(' ').trim().substring(1);
   msg.message.reading = message.join(' ').trim().substring(1);
+
+  if (msg.attributes.emotes) {
+    let regexp = /([^:/]+):(\d+)-(\d+)/gmiu;
+    let matches = msg.attributes.emotes.matchAll(regexp);
+    let replaceText = [];
+
+    for (let v of matches) {
+      replaceText.push({
+        text: msg.message.display.substring(parseInt(v[2]), parseInt(v[3]) + 1),
+        smileId: v[1],
+      });
+    }
+
+    for (let v of replaceText) { // Замена смайлов на картинки
+      msg.message.display = msg.message.display.replaceAll(v.text, '<img src="https://static-cdn.jtvnw.net/emoticons/v2/' + v.smileId + '/default/dark/1.0" />');
+    }
+  }
+
 
   console.log(msg);
 
@@ -78,9 +104,9 @@ client.on('data', function (message) {
       }
   }
 
-  // fs.appendFile('messages.txt', msg ?? '', function (err) {
-  //   if (err) return console.log(err);
-  // });
+  fs.appendFile('messages.txt', message ?? '', function (err) {
+    if (err) return console.log(err);
+  });
 });
 
 client.on('close', function () {

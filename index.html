@@ -3,20 +3,77 @@
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <!--    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">-->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
     <title>Hello World!</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        position: relative;
+      }
+
+      .message {
+        background: #285795;
+        margin: 10px;
+        padding: 10px;
+        font-family: Ubuntu, sans-serif;
+        font-size: 16px;
+        color: #FFF;
+        opacity: 1;
+      }
+
+      .header {
+        display: flex;
+        gap: 7px;
+      }
+
+      .badges {
+        display: flex;
+        list-style: none;
+      }
+
+      .badges img {
+        height: 20px;
+      }
+
+      .name {
+        font-weight: bold;
+      }
+
+      .text {
+        padding-top: 7px;
+      }
+
+      .message {
+        /*display: none;*/
+      }
+
+      #messages .message {
+        display: block;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
 
-    <div id="messages">
-
+  <div class="message">
+    <div class="header">
+      <ul class="badges">
+        <li>
+          <img src="https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/2"/>
+        </li>
+      </ul>
+      <p class="name">{{name}}</p>
     </div>
+    <div class="text">{{text}}</div>
+  </div>
 
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
+
+  <div id="messages"></div>
+
+  <!-- You can also require other files to run in this process -->
+  <script src="./renderer.js"></script>
   </body>
 </html>

@@ -5,9 +5,25 @@
 // selectively enable features needed in the rendering
 // process.
 
-window.electronAPI.onMessage((_ev, v) => {
-    let messages = document.getElementById('messages');
+let messages = document.getElementById('messages');
+let message = document.querySelector('.message');
 
-    console.log(v);
-    messages.innerHTML += v.message.raw +'<br/>';
+window.electronAPI.onMessage((_ev, v) => {
+    let msg = message.cloneNode(true);
+
+    msg.innerHTML = msg.innerHTML.replace('{{name}}', v.message.name);
+    msg.innerHTML = msg.innerHTML.replace('{{text}}', v.message.display);
+
+    // console.log(v);
+    // messages.innerHTML += `<div>[${v.message.name}]: ${v.message.display}</div>`;
+
+    messages.append(msg);
+
+    // create an Observer instance
+    const resizeObserver = new ResizeObserver(entries => {
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    // start observing a DOM node
+    resizeObserver.observe(document.body)
 })
