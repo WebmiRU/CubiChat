@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 const net = require('net');
-const fs = require("fs");
+const fs = require('fs');
 const obj = new EventEmitter();
 
 
@@ -10,7 +10,7 @@ module.exports = obj;
 const client = new net.Socket()
 
 client.connect(process.env.TWITCH_IRC_PORT, process.env.TWITCH_IRC_SERVER, () => {
-    client.write("CAP REQ :twitch.tv/commands twitch.tv/tags\r\n");
+    client.write("CAP REQ :twitch.tv/commands twitch.tv/tags twitch.tv/membership\r\n");
     client.write(`PASS ${process.env.TWITCH_TOKEN}\r\n`);
     client.write(`NICK ${process.env.TWITCH_LOGIN}\r\n`);
     client.write("JOIN #ewolf34\r\n");
@@ -24,6 +24,8 @@ client.connect(process.env.TWITCH_IRC_PORT, process.env.TWITCH_IRC_SERVER, () =>
     client.write("JOIN #artiem86\r\n");
     client.write("JOIN #handcapablesean\r\n");
     client.write("JOIN #st4nzzz\r\n");
+    client.write("JOIN #digitalcorp\r\n");
+    client.write("JOIN #makson7766724488\r\n");
 });
 
 
@@ -100,9 +102,9 @@ client.on('data', (message) => {
             }
     }
 
-    fs.appendFile('messages.txt', message ?? '', function (err) {
-        if (err) return console.log(err);
-    });
+    // fs.appendFile('messages.txt', message ?? '', function (err) {
+    //     if (err) return console.log(err);
+    // });
 });
 
 client.on('close', () => {
